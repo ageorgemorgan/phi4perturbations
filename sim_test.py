@@ -6,19 +6,20 @@ from simulation_lib import simulation
 
 import time
 
-T = 20.  # time to stop simulation at
+# first prescribe all the simulation parameters etc.
 
-dt = 2**-6  # time step size
+T = 25.  # time to stop simulation at
 
-nsteps = int(T/dt)  # total num of time steps we take
+dt = 0.01  # time step size
 
-length = 2.3*T  # 2.5*T # make sure radiation doesn't quite hit the boundary... rough computation
-# based on the signal speed being bounded above by 1 in abs val
+nsteps = int(T / dt)  # total num of time steps we take
+
+length = 64.
 
 # number of grid cells per unit axis
-N = 2**7
+N = 2 ** 9
 
-initial_state_kw = 'gaussian_even'
+initial_state_kw = 'translational_mode'
 
 # create the simulation object by prescribing physical parameters and initial conditions
 my_sim = simulation(length, T, N, dt, initial_state_kw)

@@ -108,7 +108,13 @@ class simulation:
         plt.rc('font', family='serif')
 
         fig = plt.figure()
-        ax = plt.axes(xlim=(-0.5 * self.length, 0.5 * self.length), ylim=(-.2, 0.6))
+
+        u = self.Udata[0, :, :]
+
+        umin = np.amin(u)
+        umax = np.amax(u)
+
+        ax = plt.axes(xlim=(-0.5 * self.length, 0.5 * self.length), ylim=(umin, umax))
 
         ax.grid('True')
         ax.set_xlabel('$x$', fontsize=22)
@@ -123,7 +129,7 @@ class simulation:
         def animate(i):
             line.set_data(x, self.Udata[0, i, :])
 
-            tplot = i * self.dt * 1
+            tplot = i * self.dt * 1.
 
             ax.set_ylabel('$u(x,t=%.2f)$' % tplot, fontsize=22)
 
@@ -131,9 +137,9 @@ class simulation:
 
             return line,
 
-        anim = animation.FuncAnimation(fig, animate, int(self.T / (1.*self.dt)), blit=False)
+        anim = animation.FuncAnimation(fig, animate, 1+int(self.T / (1.*self.dt)), blit=False)
 
-        dpi = 600
-        anim.save(self.moviename, fps=10, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+        dpi = 200
+        anim.save(self.moviename, fps=60, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
         # TODO: change movie so we upsample in x, to make the curves smoother.

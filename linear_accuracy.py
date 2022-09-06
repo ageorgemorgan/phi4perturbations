@@ -34,17 +34,16 @@ def exact_soln(x, t, mode_kw):
 
 # now we start to get the simulations ready
 
-T = 1.*2.*np.pi/np.sqrt(3./2.)  # time to stop simulation at (allows for the internal mode to oscillate one period)
+T = 10.*2.*np.pi/np.sqrt(3./2.)  # time to stop simulation at (allows for the internal mode to oscillate one period)
 
 length = 64.
 
 # number of grid cells per unit axis
-N = 2**8
+N = 2**7
 
 # prescribe the vectors of dt's we seek to assess
-dts = np.logspace(-8, -1, num = 8, base = 2.)
-#print(dts)
-#dts = [0.25, 0.125, 0.0625, 0.03125]
+dts = np.logspace(-10, -1, num = 10, base = 2.)
+
 # initialize outputs
 
 trans_errors = np.zeros_like(dts, dtype=float)
@@ -52,6 +51,8 @@ trans_errors = np.zeros_like(dts, dtype=float)
 internal_errors = np.zeros_like(dts, dtype=float)
 
 cnt = 0
+
+start =time.time()
 
 for dt in dts:
 
@@ -85,6 +86,10 @@ for dt in dts:
 
     cnt += 1
 
+end=time.time()
+runtime=end-start
+print('Runtime for linear accuracy tests = ', runtime, 's')
+
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
@@ -108,7 +113,6 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-#fig.set_size_inches(8, 6)
-# plt.rcParams['figure.dpi'] = 600
+plt.savefig('accuracy_test_10_periods', bbox_inches='tight', dpi=800)
 
 plt.show()

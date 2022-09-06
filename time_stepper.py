@@ -57,6 +57,8 @@ def get_greeks(length, N, dt, A):
     filename = 'greeks_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
     np.savez(filename, Q=Q, f1=f1, f2=f2, f3=f3)
 
+    # TODO: make sure this saves in a separate folder to avoid cluttering the project! Learn how to do this.
+
     return out
 
 
