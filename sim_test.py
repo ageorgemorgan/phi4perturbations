@@ -17,9 +17,9 @@ nsteps = int(T / dt)  # total num of time steps we take
 length = 64.
 
 # number of grid cells per unit axis
-N = 2 ** 9
+N = 2 ** 8
 
-initial_state_kw = 'translational_mode'
+initial_state_kw = 'gaussian_no_parity'
 
 # create the simulation object by prescribing physical parameters and initial conditions
 my_sim = simulation(length, T, N, dt, initial_state_kw)
@@ -39,7 +39,7 @@ my_sim.save()
 
 # test also that load functionality works
 
-filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw=gaussian_even.pkl'
+filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw=gaussian_no_parity.pkl'
 
 # load the pkl file and try plotting again
 with open(filename, 'rb') as inp:

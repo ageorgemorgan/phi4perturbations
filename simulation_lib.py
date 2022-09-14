@@ -2,6 +2,8 @@ import pickle
 
 import numpy as np
 
+from numpy.fft import fft, fftfreq
+
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
@@ -26,6 +28,7 @@ class simulation:
         self.initial_state = initial_state(self.x, self.initial_state_kw)
         self.filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '.pkl'
         self.picname = 'hovplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '.png'
+        self.psname = 'psplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '.png'
         self.moviename = 'movie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '.mp4'
         self.Udata = None  # the Udata will be called later!
 
@@ -86,6 +89,70 @@ class simulation:
         if save_figure is True:
 
             plt.savefig(self.picname, bbox_inches='tight', dpi=800)
+
+        else:
+
+            pass
+
+        if show_figure is True:
+
+            plt.show()
+
+        else:
+
+            pass
+
+    # create a filled contour plot in space-time of the power spectrum
+    def power_spectrum_plot(self, show_figure=True, save_figure=False):
+
+        plt.rc('text', usetex=True)
+        plt.rc('font', family='serif')
+
+        nsteps = int(self.T / self.dt)
+        times = np.linspace(0., self.T, num=1 + int(nsteps / 1.), endpoint=True)
+
+        u = self.Udata[0, :, :]
+
+        v = fft(u, axis=1)
+
+        v = np.absolute(v)**2
+
+        vmin = np.amin(v)
+        vmax = np.amax(v)
+        levels = np.linspace(vmin, vmax, num=300)
+
+        k = (2.*np.pi*self.N/self.length)*fftfreq(self.N)
+
+        CF = plt.contourf(k, times, v, cmap=cmo.thermal, levels=levels)
+
+        # axis labels
+        plt.xlabel(r"$k$", fontsize=26, color='k')
+        plt.ylabel(r"$t$", fontsize=26, color='k')
+
+        plt.tick_params(axis='x', which='both', top='off', color='k')
+        plt.xticks(fontsize=20, rotation=0, color='k')
+        plt.tick_params(axis='y', which='both', right='off', color='k')
+        plt.yticks(fontsize=20, rotation=0, color='k')
+
+        plt.xlim([0, np.amax(k)])
+
+        # make colorbar
+        cbar = plt.colorbar(CF, format='%.2f')
+        cbar.ax.tick_params(labelsize=16, color='k')
+        plt.clim(vmin, vmax)
+        cbar.ax.set_ylabel(r'$|\hat{u}(k,t)|$', fontsize=26, color='k')
+
+        # the final piece of the colorbar defn is to change the colorbar ticks to an acceptable color.
+        # This is not so easy, and relies on the thread at
+        # https://stackoverflow.com/questions/9662995/matplotlib-change-title-and-colorbar-text-and-tick-colors
+        cbytick_obj = plt.getp(cbar.ax.axes, 'yticklabels')
+        plt.setp(cbytick_obj, color='k')
+
+        plt.tight_layout()
+
+        if save_figure is True:
+
+            plt.savefig(self.psname, bbox_inches='tight', dpi=800)
 
         else:
 

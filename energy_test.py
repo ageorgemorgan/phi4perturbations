@@ -33,7 +33,7 @@ initial_state_kw = 'internal_mode'
 
 try:
 
-    filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw='+ initial_state_kw + '.pkl'
+    filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw=' + initial_state_kw + '.pkl'
 
     with open(filename, 'rb') as inp:
 
@@ -54,6 +54,7 @@ my_sim.hov_plot(show_figure=True, save_figure=False)
 
 my_sim.save_movie()
 
+
 def energy(u, ut, x=x, N=N, length=length):
     kin = ut ** 2
 
@@ -72,6 +73,7 @@ def energy(u, ut, x=x, N=N, length=length):
     out = 0.5 * simpson(kin + spring + potential)
 
     return out
+
 
 # now get the energies associated to each time
 
@@ -110,4 +112,3 @@ plt.tight_layout()
 # plt.savefig('energy_test_NL_N=2^9_dt=1e-2', bbox_inches='tight', dpi=800)
 
 plt.show()
-
