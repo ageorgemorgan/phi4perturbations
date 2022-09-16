@@ -16,18 +16,18 @@ import time
 
 # first prescribe all the simulation parameters etc.
 
-T = 30.  # time to stop simulation at
+T = 10.  # time to stop simulation at
 
-dt = 0.01  # time step size
+dt = 1e-3  # time step size
 
 nsteps = int(T / dt)  # total num of time steps we take
 
 length = 64.
 
 # number of grid cells per unit axis
-N = 2 ** 9
+N = 2 ** 8
 
-initial_state_kw = 'internal_mode'
+initial_state_kw = 'translational_mode'
 
 # obtain the relevant simulation, either by loading it up again or by running it.
 
@@ -43,7 +43,7 @@ except:
 
     my_sim = simulation(length, T, N, dt, initial_state_kw)
 
-    my_sim.run_sim(nonlinear=True)
+    my_sim.run_sim(nonlinear=False)
 
     my_sim.save()
 
@@ -52,7 +52,7 @@ Udata = my_sim.Udata
 
 my_sim.hov_plot(show_figure=True, save_figure=False)
 
-my_sim.save_movie()
+#my_sim.save_movie()
 
 
 def energy(u, ut, x=x, N=N, length=length):
@@ -67,7 +67,7 @@ def energy(u, ut, x=x, N=N, length=length):
 
     spring = ux ** 2
 
-    potential = (2. + V0(x)) * (u ** 2) + 2. * K0(x) * u ** 3 + 0.5 * u ** 4
+    potential = (2. + V0(x)) * (u ** 2) + 0.*(2. * K0(x) * u ** 3 + 0.5 * u ** 4)
 
     # do Simpson integration
     out = 0.5 * simpson(kin + spring + potential)
@@ -94,13 +94,13 @@ plt.rc('font', family='serif')
 
 fig, ax = plt.subplots()
 
-plt.plot(times, 1e2*(E-E[0])/E[0], '-', color='xkcd:teal', linewidth='2')
+plt.plot(times, (E-E[0]), '-', color='xkcd:teal', linewidth='2')
 
 plt.xlim([0, T])
 # plt.ylim([-5.6,2])
 
 plt.xlabel(r"$t$", fontsize=26, color='k')
-plt.ylabel(r"Relative Error in $E[u]$", fontsize=26, color='k')
+plt.ylabel(r"Error in $E[u]$", fontsize=26, color='k')
 
 plt.tick_params(axis='x', which='both', top='off', color='k')
 plt.xticks(fontsize=16, rotation=0, color='k')
@@ -109,6 +109,6 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-# plt.savefig('energy_test_NL_N=2^9_dt=1e-2', bbox_inches='tight', dpi=800)
+plt.savefig('energy_test_L_N=2^8_dt=1e-3', bbox_inches='tight', dpi=800)
 
 plt.show()
