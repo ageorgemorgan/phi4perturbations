@@ -19,7 +19,7 @@ length = 64.
 # number of grid cells per unit axis
 N = 2 ** 8
 
-initial_state_kw = 'gaussian_no_parity'
+initial_state_kw = 'gaussian_even'
 
 # create the simulation object by prescribing physical parameters and initial conditions
 my_sim = simulation(length, T, N, dt, initial_state_kw)
@@ -47,4 +47,4 @@ with open(filename, 'rb') as inp:
 
     my_sim.hov_plot(show_figure=True, save_figure=True)
 
-    my_sim.save_movie()
+    #my_sim.save_movie()

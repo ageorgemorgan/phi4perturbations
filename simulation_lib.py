@@ -32,6 +32,9 @@ class simulation:
         self.moviename = 'movie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '.mp4'
         self.Udata = None  # the Udata will be called later!
 
+        # TODO: make ndump (we save every ndump time steps) an attribute for a simulation object... rn it is disconnected
+        #    and poorly organized.
+
     # a function for actually performing the time-stepping on a simulation object. Adds the property Udata
     # to the simulation object (the actual values of our solution throughout the simulation)
     def run_sim(self, nonlinear=True):
@@ -103,6 +106,10 @@ class simulation:
             pass
 
     # create a filled contour plot in space-time of the power spectrum
+    # TODO: this needs to be changed bcz parity concerns would screw up the FT of our solution a bit. Consequently,
+    #     a contour plot of the power spectrum is really the wrong thing to do, and a movie would be better.
+    #     AS introduced the idea of having a small movie of the power spectrum appear in the corner of spatial movies.
+    #     So, implement this!
     def power_spectrum_plot(self, show_figure=True, save_figure=False):
 
         plt.rc('text', usetex=True)

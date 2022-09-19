@@ -7,21 +7,21 @@ import matplotlib.pyplot as plt
 
 from simulation_lib import simulation
 
-from bound_states import bound_state
-
 import time
 
+
+# here, we perform a nonlinear refinement study (in $\Delta t$) to assess the accuracy of our complete solver. Of course,
+# refinement in N is a bit suspect since we use a spectral discretization in space!
+
 # start to get the simulations ready
+
+T = 25.  # time to stop simulation at (allows for the internal mode to oscillate ten period)
 
 length = 64.
 
 # prescribe the array of dt's we seek to assess
 dts = np.logspace(-10, -2, num=9, base=2.)
 num_dts = np.size(dts)
-
-num_steps = 1e4
-
-Ts = num_steps*dts
 
 # prescribe the array of N's we seek to assess
 Ns = (2**8)*np.linspace(0.375, 1, num=4, endpoint=True)  # should always use powers of 2 for spectral methods, but the accuracy is important here!
@@ -40,23 +40,51 @@ for k in np.arange(0, num_Ns):
 
     N = Ns[k]
 
-    for m in np.arange(0, num_dts):
+    # do simulation at the worst order first
 
-        dt = dts[m]
+    rough_sim = simulation(length, T, N, dts[0], 'internal_mode')
 
-        T = Ts[m]
+    rough_filename = rough_sim.filename
 
-        sim = simulation(length, T, N, dt, 'translational_mode')
+    try:
+        # load the pkl file and try plotting again
+        with open(rough_filename, 'rb') as inp:
+            rough_sim = pickle.load(inp)
 
-        x = sim.x
+    except:
 
-        sim.run_sim(nonlinear=False)
+        rough_sim.run_sim(nonlinear=True)
 
-        Udata = sim.Udata
+        rough_sim.save()
 
-        exact = bound_state(x, T, mode_kw='translational_mode')[0, :]
+    x = rough_sim.x  # same for both rough and fine
 
-        errors[k, cnt] = np.linalg.norm(Udata[0, int(T/dt), :] - exact, ord=np.inf)
+    for dt in dts:
+
+        fine_sim = simulation(length, T, N, 0.5*dt, 'internal_mode')
+
+        fine_filename = fine_sim.filename
+
+        try:
+            # load the pkl file and try plotting again
+            with open(fine_filename, 'rb') as inp:
+                fine_sim = pickle.load(inp)
+
+        except:
+
+            fine_sim.run_sim(nonlinear=True)
+
+            fine_sim.save()
+
+        rough_Udata = rough_sim.Udata
+
+        fine_Udata = fine_sim.Udata
+
+        # use fine sim and rough sim to get Richardson error estimate
+
+        errors[k, cnt] = (1./15.)*np.linalg.norm(rough_Udata[0, -1, :] - fine_Udata[0, -1, :] , ord=np.inf)
+
+        rough_sim = fine_sim  # redefine for efficiency... only works bcz we refine dt in powers of 1/2
 
         cnt += 1
 
@@ -64,13 +92,14 @@ for k in np.arange(0, num_Ns):
 
 end = time.time()
 runtime = end-start
-print('Runtime for linear accuracy tests = ', runtime, 's')
+print('Runtime for nonlinear accuracy tests = ', runtime, 's')
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 fig, ax = plt.subplots()
 
+dts = 0.5*dts
 plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=96$")
 plt.loglog(dts, errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
 plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=149$")
@@ -92,6 +121,14 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-plt.savefig('translational_mode_accuracy_test_1e4_steps', bbox_inches='tight', dpi=800)
+plt.savefig('nonlinear_accuracy_test_internal_mode', bbox_inches='tight', dpi=800)
 
 plt.show()
+
+"""
+params = np.polyfit(np.log10(dts[4:]), np.log10(errors[-1, 4:]), 1)
+slope = params[0]
+
+print('Estimated slope at N = 256 = ', slope)
+"""
+

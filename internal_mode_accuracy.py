@@ -68,11 +68,11 @@ plt.rc('font', family='serif')
 
 fig, ax = plt.subplots()
 
-plt.loglog(dts, internal_errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=112$")
+plt.loglog(dts, internal_errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=96$")
 plt.loglog(dts, internal_errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
-plt.loglog(dts, internal_errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=160$")
+plt.loglog(dts, internal_errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=149$")
 plt.loglog(dts, internal_errors[1, :],  color='xkcd:raspberry', linewidth='2', linestyle='solid')
-plt.loglog(dts, internal_errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=208$")
+plt.loglog(dts, internal_errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=202$")
 plt.loglog(dts, internal_errors[2, :],  color='xkcd:goldenrod', linewidth='2', linestyle='solid')
 plt.loglog(dts, internal_errors[3, :], 'd', color='xkcd:slate', markersize='8', label=r"$N=256$")
 plt.loglog(dts, internal_errors[3, :],  color='xkcd:slate', linewidth='2', linestyle='solid')
@@ -93,7 +93,7 @@ plt.savefig('internal_mode_accuracy_test_10_periods', bbox_inches='tight', dpi=8
 
 plt.show()
 
-params = np.polyfit(np.log10(dts[2:]), np.log10(internal_errors[-1, 2:]), 1)
-slope = params[0]
+#params = np.polyfit(np.log10(dts[2:]), np.log10(internal_errors[-1, 2:]), 1)
+#slope = params[0]
 
-print('Estimated slope at N=256 = ', slope)
+#print('Estimated slope at N=256 = ', slope)

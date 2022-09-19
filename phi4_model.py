@@ -36,7 +36,7 @@ def fourier_forcing(V, x, nonlinear=True):
     spatial_forcing = -1.*V0(x) * u - float(nonlinear)*(3. * K0(x) * u ** 2 + u ** 3)
 
     out = 1j * np.zeros(2 * N, dtype=float)
-    out[N:] = fft(spatial_forcing)  # CHANGE FOR WAVE EQN
+    out[N:] = fft(spatial_forcing)
 
     return out
 
