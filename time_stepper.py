@@ -26,10 +26,10 @@ def get_greeks(length, N, dt, A):
 
     id_matrix = sparse.eye(2 * N)
 
-    Q = 1j * np.zeros([2 * N, 2 * N], dtype=float)
-    f1 = 1j * np.zeros([2 * N, 2 * N], dtype=float)
-    f2 = 1j * np.zeros([2 * N, 2 * N], dtype=float)
-    f3 = 1j * np.zeros([2 * N, 2 * N], dtype=float)
+    Q = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
+    f1 = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
+    f2 = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
+    f3 = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
 
     for j in np.arange(0, M):
 
@@ -108,7 +108,7 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True):
     V = np.concatenate((v1, v2))
 
     # make data storage array
-    Udata = np.zeros([2, 1+int(nsteps / ndump), N], dtype=float)
+    Udata = np.zeros([2, 1+int(nsteps / ndump), N], dtype=np.float64)
     Udata[:, 0, :] = Uinit
 
     cnt = 0.  # counter
@@ -148,6 +148,8 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True):
 
             Udata[0, int(n / ndump), :] = np.real(ifft(V[0:N]))
             Udata[1, int(n / ndump), :] = np.real(ifft(V[N:]))
+
+            #Udata = np.around(Udata, 4) # low-precision test
 
         else:
 

@@ -33,9 +33,9 @@ def fourier_forcing(V, x, nonlinear=True):
 
     u = np.real(ifft(V[0:N]))  # only ifft first N entries of V because of storage conventions
 
-    spatial_forcing = -1.*V0(x) * u - float(nonlinear)*(3. * K0(x) * u ** 2 + u ** 3)
+    spatial_forcing = -1.*V0(x) * u - np.float64(nonlinear)*(3. * K0(x) * u ** 2 + u ** 3)
 
-    out = 1j * np.zeros(2 * N, dtype=float)
+    out = 1j * np.zeros(2 * N, dtype=np.float64)
     out[N:] = fft(spatial_forcing)
 
     return out
@@ -51,6 +51,6 @@ def get_spatial_operator(length, N):
     L = -(k ** 2 + 2. * np.ones_like(k))  # CHANGE FOR WAVE EQN
 
     # put L together into sparse block matrix , multiply by dt
-    A = sparse.diags([L, np.ones(N, dtype=float)], [-N, N], shape=[2 * N, 2 * N]).tocsc()
+    A = sparse.diags([L, np.ones(N, dtype=np.float64)], [-N, N], shape=[2 * N, 2 * N]).tocsc()
 
     return A

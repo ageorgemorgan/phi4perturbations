@@ -19,7 +19,7 @@ length = 64.
 dts = np.logspace(-10, -2, num=9, base=2.)
 num_dts = np.size(dts)
 
-num_steps = 1e4
+num_steps = 1e3
 
 Ts = num_steps*dts
 
@@ -92,6 +92,6 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-plt.savefig('translational_mode_accuracy_test_1e4_steps', bbox_inches='tight', dpi=800)
+plt.savefig('translational_mode_accuracy_test_1e3_steps', bbox_inches='tight', dpi=800)
 
 plt.show()

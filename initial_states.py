@@ -8,7 +8,7 @@ def initial_state(x, initial_state_kw):
     k0 = 1.
     width = 1.
 
-    out = np.zeros([2, np.size(x)], dtype=float)
+    out = np.zeros([2, np.size(x)], dtype=np.float64)
 
     if initial_state_kw == 'gaussian_even':
 
@@ -28,7 +28,7 @@ def initial_state(x, initial_state_kw):
 
     elif initial_state_kw == 'internal_mode':
 
-        out[0, :] = amp*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2)) ) ** -2
+        out[0, :] = np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2)) ) ** -2
 
     elif initial_state_kw == 'trivial':
 
