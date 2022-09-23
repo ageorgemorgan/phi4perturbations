@@ -24,7 +24,7 @@ def get_greeks(length, N, dt, A):
     rad = 1.2 * dt * np.sqrt(max_freq**2 + 2.)
     r = rad * np.exp(1j * theta)
 
-    id_matrix = sparse.eye(2 * N)
+    id_matrix = sparse.eye(2 * N, dtype=np.float64)
 
     Q = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
     f1 = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)

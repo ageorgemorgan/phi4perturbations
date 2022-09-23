@@ -48,4 +48,7 @@ with open(filename, 'rb') as inp:
 
     my_sim.hov_plot(show_figure=True, save_figure=True)
 
+    my_sim.phi_plot(show_figure=True, save_figure=True)
+
+
     #my_sim.save_movie()
