@@ -24,12 +24,12 @@ def get_greeks(length, N, dt, A):
     rad = 1.2 * dt * np.sqrt(max_freq**2 + 2.)
     r = rad * np.exp(1j * theta)
 
-    id_matrix = sparse.eye(2 * N, dtype=np.float64)
+    id_matrix = sparse.eye(2 * N, dtype=float)
 
-    Q = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
-    f1 = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
-    f2 = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
-    f3 = 1j * np.zeros([2 * N, 2 * N], dtype=np.float64)
+    Q = 1j * np.zeros([2 * N, 2 * N], dtype=float)
+    f1 = 1j * np.zeros([2 * N, 2 * N], dtype=float)
+    f2 = 1j * np.zeros([2 * N, 2 * N], dtype=float)
+    f3 = 1j * np.zeros([2 * N, 2 * N], dtype=float)
 
     for j in np.arange(0, M):
 
@@ -62,7 +62,7 @@ def get_greeks(length, N, dt, A):
     return out
 
 
-def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True):
+def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True, ndump=10):
     # TODO: replace the syntax so the input is a simulation object instead of a whole bunch of crap... I think it's nice
     # that the simulation object only touches the time-stepping script directly. Alternatively have the input
     # be a dict that is constructed from a simulation object.
@@ -98,8 +98,6 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True):
     propagator = linalg.expm(A.multiply(dt))
     propagator2 = linalg.expm(A.multiply(0.5*dt))
 
-    ndump = 1.
-
     Uinit = initial_state
 
     v1 = fft(Uinit[0, :])
@@ -108,8 +106,10 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True):
     V = np.concatenate((v1, v2))
 
     # make data storage array
-    Udata = np.zeros([2, 1+int(nsteps / ndump), N], dtype=np.float64)
+    Udata = np.zeros([2, 1+int(nsteps / ndump), N], dtype=float)
     Udata[:, 0, :] = Uinit
+
+    # print('num of times sampled = ',  1+int(nsteps / ndump))
 
     cnt = 0.  # counter
 
@@ -144,12 +144,14 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True):
 
         cnt += 1
 
+        # print('step no', cnt)
+
         if cnt % ndump == 0:
 
             Udata[0, int(n / ndump), :] = np.real(ifft(V[0:N]))
             Udata[1, int(n / ndump), :] = np.real(ifft(V[N:]))
 
-            #Udata = np.around(Udata, 4) # low-precision test
+            # print('saved at step', n)
 
         else:
 

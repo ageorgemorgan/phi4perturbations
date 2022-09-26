@@ -15,19 +15,19 @@ import time
 
 length = 64.
 
-# prescribe the array of dt's we seek to assess
-dts = np.logspace(-10, -2, num=9, base=2.)
-num_dts = np.size(dts)
+num_steps = 1e4
 
-num_steps = 1e3
+# prescribe the array of dt's we seek to assess
+nmin = 10
+dts = np.flip(np.logspace(-nmin, -2, num=nmin-1, base=2.))
+num_dts = np.size(dts)
 
 Ts = num_steps*dts
 
 # prescribe the array of N's we seek to assess
-Ns = (2**8)*np.linspace(0.375, 1, num=4, endpoint=True)  # should always use powers of 2 for spectral methods, but the accuracy is important here!
+Ns = np.array([64, 128, 256])
 Ns = Ns.astype(int)
 num_Ns = np.size(Ns)
-
 # initialize outputs
 
 errors = np.zeros([num_Ns, num_dts], dtype=float)
@@ -46,17 +46,28 @@ for k in np.arange(0, num_Ns):
 
         T = Ts[m]
 
-        sim = simulation(length, T, N, dt, 'translational_mode')
+        sim = simulation(length, T, N, dt, 'translational_mode', nonlinear=False)
 
         x = sim.x
 
-        sim.run_sim(nonlinear=False)
+        filename = sim.filename
+
+        try:
+            # load the pkl file and try plotting again
+            with open(filename, 'rb') as inp:
+                sim = pickle.load(inp)
+
+        except:
+
+            sim.run_sim()
+
+            sim.save()
 
         Udata = sim.Udata
 
         exact = bound_state(x, T, mode_kw='translational_mode')[0, :]
 
-        errors[k, cnt] = np.linalg.norm(Udata[0, int(T/dt), :] - exact, ord=np.inf)
+        errors[k, cnt] = np.linalg.norm(Udata[0, -1, :] - exact, ord=np.inf)
 
         cnt += 1
 
@@ -71,14 +82,12 @@ plt.rc('font', family='serif')
 
 fig, ax = plt.subplots()
 
-plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=96$")
-plt.loglog(dts, errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=149$")
+#plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=64$")
+#plt.loglog(dts, errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
+plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=128$")
 plt.loglog(dts, errors[1, :],  color='xkcd:raspberry', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=202$")
+plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=256$")
 plt.loglog(dts, errors[2, :],  color='xkcd:goldenrod', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[3, :], 'd', color='xkcd:slate', markersize='8', label=r"$N=256$")
-plt.loglog(dts, errors[3, :],  color='xkcd:slate', linewidth='2', linestyle='solid')
 
 ax.legend(fontsize=16)
 

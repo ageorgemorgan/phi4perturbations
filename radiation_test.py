@@ -39,9 +39,9 @@ try:
 
 except:
 
-    my_sim = simulation(length, T, N, dt, initial_state_kw)
+    my_sim = simulation(length, T, N, dt, initial_state_kw, nonlinear=True)
 
-    my_sim.run_sim(nonlinear=True)
+    my_sim.run_sim()
 
     my_sim.save()
 
@@ -49,7 +49,7 @@ x = my_sim.x
 Udata = my_sim.Udata
 
 
-#my_sim.hov_plot(show_figure=True, save_figure=False)
+# my_sim.hov_plot(show_figure=True, save_figure=False)
 # my_sim.power_spectrum_plot(show_figure=True, save_figure=False)
 
 
@@ -66,6 +66,7 @@ def compute_envelope(u, kmin=1, kmax=int(0.5 * N)):
 
     return out
 
+
 u = Udata[0, :, :]
 
 A = compute_envelope(u, kmin=20, kmax=int(0.5*N))
@@ -75,7 +76,7 @@ Amax = np.amax(A)
 levels = np.linspace(Amin, Amax, num=300)
 
 nsteps = int(T / dt)
-times = np.linspace(0., T, num=1 + int(nsteps / 1.), endpoint=True)
+times = np.linspace(0., T, num=1 + int(nsteps / my_sim.ndump), endpoint=True)
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')

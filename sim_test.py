@@ -22,12 +22,12 @@ N = 2 ** 8
 initial_state_kw = 'internal_mode'
 
 # create the simulation object by prescribing physical parameters and initial conditions
-my_sim = simulation(length, T, N, dt, initial_state_kw)
+my_sim = simulation(length, T, N, dt, initial_state_kw, nonlinear=True)
 
 #"""
 # run the simulation
 start = time.time()
-my_sim.run_sim(nonlinear=True)
+my_sim.run_sim()
 end = time.time()
 
 runtime = end-start
@@ -40,7 +40,7 @@ my_sim.save()
 #"""
 # test also that load functionality works
 
-filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw=internal_mode.pkl'
+filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw=internal_mode_nonlinear=True.pkl'
 
 # load the pkl file and try plotting again
 with open(filename, 'rb') as inp:
@@ -49,6 +49,5 @@ with open(filename, 'rb') as inp:
     my_sim.hov_plot(show_figure=True, save_figure=True)
 
     my_sim.phi_plot(show_figure=True, save_figure=True)
-
 
     #my_sim.save_movie()
