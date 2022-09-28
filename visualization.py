@@ -4,9 +4,18 @@ import matplotlib.pyplot as plt
 
 import cmocean.cm as cmo
 
+import matplotlib.animation as animation
+
+from scipy.interpolate import CubicSpline
+
+from numpy.fft import fft, fftfreq, fftshift
+
+import sys
 
 # create Hovmoeller plot of a scalar field u
-def hov_plot(x, t, u, show_figure=True, save_figure=False, picname="", cmap=cmo.haline):
+
+
+def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname="", cmap=cmo.haline):
 
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
@@ -30,7 +39,7 @@ def hov_plot(x, t, u, show_figure=True, save_figure=False, picname="", cmap=cmo.
     cbar = plt.colorbar(CF, format='%.2f')
     cbar.ax.tick_params(labelsize=16, color='k')
     plt.clim(umin, umax)
-    cbar.ax.set_ylabel(r'$u(x,t)$', fontsize=26, color='k')
+    cbar.ax.set_ylabel(fieldname, fontsize=26, color='k')
 
     # the final piece of the colorbar defn is to change the colorbar ticks to an acceptable color.
     # This is not so easy, and relies on the thread at
@@ -55,3 +64,313 @@ def hov_plot(x, t, u, show_figure=True, save_figure=False, picname="", cmap=cmo.
     else:
 
         pass
+
+# create a movie from a scalar field u(t,x) sampled at various times.
+
+
+def save_movie(u, x, length, dt, ndump, filename, periodic=True):
+
+    # Create movie file in mp4 format. Warning: this is very slow!
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig = plt.figure()
+
+    umin = 1.05*np.amin(u)
+    umax = 1.05*np.amax(u)
+
+    ax = plt.axes(xlim=(-0.5 * length, 0.5 * length), ylim=(umin, umax))
+
+    # use cubic spline interpolation to smooth the data
+
+    # note that spline interpolation is necessary to combat the Runge phenomenon since we have a uniform grid! Naive
+    # use of barycentric interpolation is not an option.
+
+    if periodic:
+
+        # add endpoint
+        x_end = np.append(x, 0.5*length)
+
+        [M, N] = np.shape(u)
+
+        u_end = np.zeros([M, N+1], dtype=float)
+
+        u_end[:, 0:N] = u
+
+        u_end[:, -1] = np.copy(u[:, 0])  # enforce periodicity
+
+        # create the interpolating spline polynomial using scipy interpolation package
+
+        poly = CubicSpline(x_end, u_end, axis=1, bc_type='periodic')
+
+    else:
+
+        poly = CubicSpline(x, u, axis=1)
+
+    # now we can actually do the upsampling
+
+    NN = 600  # number of points to evaluate interpolant at
+
+    xx = np.linspace(-0.5 * length, 0.5 * length, NN, endpoint=True)
+
+    uu = poly(xx)
+
+    x = xx
+
+    u = uu
+
+    ax.grid('True')
+    ax.set_xlabel('$x$', fontsize=22)
+
+    if periodic:
+
+        color = 'xkcd:ocean green'
+
+    else:
+
+        color = 'xkcd:dark magenta'
+
+    line, = ax.plot([], [], linewidth=2, color=color)
+
+    timer = fig.canvas.new_timer(interval=100)
+    timer.add_callback(u, ax)
+    timer.start()
+
+    # Animation function.
+    def animate(i):
+        line.set_data(x, u[i, :])
+
+        tplot = i * dt * ndump
+
+        if periodic:
+
+            ax.set_ylabel('$u(x,t=%.2f)$' % tplot, fontsize=22)
+
+        else:
+
+            ax.set_ylabel('$\phi(x,t=%.2f)$' % tplot, fontsize=22)
+
+        # TODO: the above label fixes are kind of a jerry-rigged solution and don't generalize easily to other PDE!
+        #     Find a smart way to fix this!
+
+        plt.tight_layout()
+
+        return line,
+
+    anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
+
+    dpi = 200
+    anim.save(filename, fps=60, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+
+# create a movie from a scalar field u(t,x) sampled at various times.
+
+
+def save_psmovie(u, x, length, dt, ndump, filename):
+
+    # Create movie file in mp4 format. Warning: this is very slow!
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig = plt.figure()
+
+    v = np.absolute(fft(u, axis=1))**2
+
+    N = np.shape(x)[0]
+
+    """
+    
+    # OPTION 1 (RAW): append an extra zero to the end of the frequency array and plot as-is
+    
+    k = 2. * np.pi * N * fftfreq(N) / length
+    
+    kmin = np.amin(k)
+    kmax = np.amax(k)
+
+    vmin = 1.05 * np.amin(v)
+    vmax = 1.05 * np.amax(v)
+
+    k = np.append(k, 0.)
+
+    [M, N] = np.shape(v)
+
+    v_end = np.zeros([M, N + 1], dtype=float)
+
+    v_end[:, 0:N] = v
+
+    v_end[:, -1] = np.copy(v[:, 0])  # enforce periodicity
+
+    v = v_end
+    """
+
+    # """
+
+    # OPTION 2: smooth the power spectrum using cubic spline interpolation
+
+    k = fftshift(2. * np.pi * N * fftfreq(N) / length)
+
+    kmin = np.amin(k)
+    kmax = np.amax(k)
+
+    vmin = 1.05 * np.amin(v)
+    vmax = 1.05 * np.amax(v)
+
+    v = fftshift(v, axes=1)
+
+    poly = CubicSpline(k, v, axis=1)  # ignore periodic flag here, it's not really worth the extra effort
+
+    NN = 3600  # number of points to evaluate interpolant at
+
+    kk = np.linspace(kmin, kmax, NN, endpoint=True)
+
+    vv = poly(kk)
+
+    k = kk
+
+    v = vv
+    
+    # """
+
+    ax = plt.axes(xlim=(kmin, kmax), ylim=(vmin, vmax))
+
+    ax.grid('True')
+    ax.set_xlabel('$k$', fontsize=22)
+
+    line, = ax.plot([], [], linewidth=1.5, color='xkcd:dark orange')
+    # markers, = ax.plot([], [], 'o',  markersize='8', color='xkcd:dark orange')
+
+    timer = fig.canvas.new_timer(interval=100)
+    timer.add_callback(v, ax)
+    timer.start()
+
+    # Animation function.
+    def animate(i):
+        line.set_data(k, v[i, :])
+
+        # markers.set_data(k[::2], v[i, ::2])
+
+        tplot = i * dt * ndump
+
+        ax.set_ylabel('$|\widehat{u}|^2(k,t=%.2f)$' % tplot, fontsize=22)
+
+        plt.tight_layout()
+
+        return line,
+
+    anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
+
+    dpi = 200
+    anim.save(filename, fps=60, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+
+# saves movie of a (periodic) scalar field AND its power spectrum
+
+
+def save_combomovie(u, x, length, dt, ndump, filename):
+
+    # Create movie file in mp4 format. Warning: this is very slow!
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig = plt.figure()
+
+    umin = 1.05*np.amin(u)
+    umax = 1.05*np.amax(u)
+
+    ax = plt.axes(xlim=(-0.5 * length, 0.5 * length), ylim=(umin, umax))
+
+    # create insert axes
+    v = np.absolute(fft(u, axis=1)) ** 2
+
+    N = np.shape(x)[0]
+
+    k = fftshift(2. * np.pi * N * fftfreq(N) / length)
+
+    kmin = np.amin(k)
+    kmax = np.amax(k)
+
+    vmin = 1.05 * np.amin(v)
+    vmax = 1.05 * np.amax(v)
+
+    v = fftshift(v, axes=1)
+
+    # TODO: massage location params below (first two numbers) and size params below (last two numbers) to make the combo
+    # movies look even better
+    ins = ax.inset_axes([0.67, 0.67, 0.3, 0.3], xlim=(kmin, kmax), ylim=(vmin, vmax))
+
+    # use cubic spline interpolation to smooth the state data
+
+    # note that spline interpolation is necessary to combat the Runge phenomenon since we have a uniform grid! Naive
+    # use of barycentric interpolation is not an option.
+
+    # add endpoint
+    x_end = np.append(x, 0.5*length)
+
+    [M, N] = np.shape(u)
+
+    u_end = np.zeros([M, N+1], dtype=float)
+
+    u_end[:, 0:N] = u
+
+    u_end[:, -1] = np.copy(u[:, 0])  # enforce periodicity
+
+    # create the interpolating spline polynomial using scipy interpolation package
+
+    poly = CubicSpline(x_end, u_end, axis=1, bc_type='periodic')
+
+    # now we can actually do the spatial upsampling
+
+    NN = 600  # number of points to evaluate interpolant at
+
+    xx = np.linspace(-0.5 * length, 0.5 * length, NN, endpoint=True)
+
+    uu = poly(xx)
+
+    x = xx
+
+    u = uu
+
+    # now make smaller insert graph plotting data
+
+    poly = CubicSpline(k, v, axis=1)  # ignore periodic flag here, it's not really worth the extra effort
+
+    NN = 3600  # number of points to evaluate interpolant at
+
+    kk = np.linspace(kmin, kmax, NN, endpoint=True)
+
+    vv = poly(kk)
+
+    k = kk
+
+    v = vv
+
+    ax.grid(True)
+    ax.set_xlabel('$x$', fontsize=22)
+
+    ins.grid(False)
+    ins.set_xlabel('$k$', fontsize=11)
+
+    line, = ax.plot([], [], linewidth=2, color='xkcd:ocean green')
+    iline, = ins.plot([], [], linewidth=1.5, color='xkcd:dark orange')
+
+    timer = fig.canvas.new_timer(interval=100)
+    timer.add_callback(u, ax)
+    timer.start()
+
+    # Animation function.
+    def animate(i):
+        line.set_data(x, u[i, :])
+        iline.set_data(k, v[i, :])
+
+        tplot = i * dt * ndump
+
+        ax.set_ylabel('$u(x,t=%.2f)$' % tplot, fontsize=22)
+
+        ins.set_ylabel('$|\widehat{u}|^2(k,t=%.2f)$' % tplot, fontsize=11)
+
+        plt.tight_layout()
+
+        return line,
+
+    anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
+
+    dpi = 200
+    anim.save(filename, fps=60, extra_args=['-vcodec', 'libx264'], dpi=dpi)

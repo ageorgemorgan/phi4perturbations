@@ -124,13 +124,13 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-#plt.savefig('linear_accuracy_test_internal_mode_longtime_single', bbox_inches='tight', dpi=800)
+plt.savefig('linear_accuracy_test_internal_mode_longtime', bbox_inches='tight', dpi=800)
 
 plt.show()
 
 # """
-params = np.polyfit(np.log10(dts[0:4]), np.log10(errors[-1, 0:4]), 1)
+params = np.polyfit(np.log10(dts[0:]), np.log10(errors[-1, 0:]), 1)
 slope = params[0]
 
-print('Estimated slope at N = 256 is slope = ', slope)
+print('Estimated slope at N = 512 is slope = ', slope)
 # """

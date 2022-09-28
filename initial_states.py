@@ -31,6 +31,12 @@ def initial_state(x, initial_state_kw):
 
         out[0, :] = np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
 
+    elif initial_state_kw == 'tritone':
+
+        a = 1.2*np.sqrt(2.)  # this value gives the Getmanov tri-tone!
+
+        out[0, :] = a*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
+
     elif initial_state_kw == 'trivial':
 
         pass
@@ -42,6 +48,6 @@ def initial_state(x, initial_state_kw):
     else:
 
         raise NameError("Invalid initial state keyword string. Acceptable keywords: gaussian_even, gaussian_odd, "
-                        "gaussian_no_parity, translational_mode, internal_mode, 0_energy, trivial")
+                        "gaussian_no_parity, translational_mode, internal_mode, tritone, 0_energy, trivial")
 
     return out
