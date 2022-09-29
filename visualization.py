@@ -159,8 +159,8 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True):
 
     anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
 
-    dpi = 200
-    anim.save(filename, fps=60, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    dpi = 600
+    anim.save(filename, fps=30, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
 # create a movie from a scalar field u(t,x) sampled at various times.
 
@@ -258,8 +258,8 @@ def save_psmovie(u, x, length, dt, ndump, filename):
 
     anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
 
-    dpi = 200
-    anim.save(filename, fps=60, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    dpi = 600
+    anim.save(filename, fps=30, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
 # saves movie of a (periodic) scalar field AND its power spectrum
 
@@ -370,5 +370,5 @@ def save_combomovie(u, x, length, dt, ndump, filename):
 
     anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
 
-    dpi = 200
-    anim.save(filename, fps=60, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    dpi = 600
+    anim.save(filename, fps=30, extra_args=['-vcodec', 'libx264'], dpi=dpi)

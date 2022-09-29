@@ -1,6 +1,7 @@
 import pickle
 
 import numpy as np
+from numpy.fft import fft
 
 from simulation_lib import simulation
 
@@ -19,41 +20,61 @@ length = 64.
 # number of grid cells per unit axis
 N = 2 ** 8
 
-initial_state_kw = 'translational_mode'
+initial_state_kw = 'gaussian_odd'
 
-# create the simulation object by prescribing physical parameters and initial conditions
+# create the simulation object by prescribing physical parameters, discretization parameters, initial conditions, and
+# whether or not we want to include nonlinearity
 my_sim = simulation(length, T, N, dt, initial_state_kw, nonlinear=True)
 
-# """
-# run the simulation
-start = time.time()
-my_sim.run_sim()
-end = time.time()
+# extract the filename attribute
+my_filename = my_sim.filename
 
-runtime = end-start
-print('Simulation runtime = ', runtime, 's')
+try:
+    # load the pkl file containing the sim data (if it exists!) to save a lot of time
+    with open(my_filename, 'rb') as inp:
+            my_sim = pickle.load(inp)
 
-Udata = my_sim.Udata
+            print('Saved simulation found, loading saved data.')
 
-# save the output to a pkl
-my_sim.save()
-# """
-# also test  that load functionality works
 
-filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw=' + initial_state_kw + '_nonlinear=True.pkl'
+except:
 
-# load the pkl file and try plotting again
-with open(filename, 'rb') as inp:
-    my_sim = pickle.load(inp)
+    # if the sim has not been saved, run it and save it
 
-    my_sim.hov_plot(show_figure=True, save_figure=True)
+    print('No saved simulation found, running simulation.')
 
-    my_sim.phi_plot(show_figure=True, save_figure=True)
+    start = time.time()
 
-    # my_sim.save_movie()
+    my_sim.run_sim()
 
-    my_sim.save_phimovie()
+    end = time.time()
 
-    # my_sim.save_psmovie()
+    runtime = end - start
+    print('Simulation runtime = ', runtime, 's')
 
-    my_sim.save_combomovie()
+    my_sim.save()
+
+# report magnitude of last Fourier coefficient
+u = my_sim.Udata[0, :, :]
+
+v = np.absolute(fft(u, axis=1))
+
+m = int(0.5*N) - 1  # index of largest positive frequency
+
+v_last = np.amax(v[:, m])
+
+print('Maximum over time of modulus of last Fourier coefficient at N =', N, 'is = ', v_last)
+
+# produce plots and movies
+
+# my_sim.hov_plot(show_figure=False, save_figure=True)
+
+#my_sim.phi_plot(show_figure=False, save_figure=True)
+
+# my_sim.save_movie()
+
+# my_sim.save_phimovie()
+
+# my_sim.save_psmovie()
+
+# my_sim.save_combomovie()

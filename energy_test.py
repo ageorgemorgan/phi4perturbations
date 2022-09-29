@@ -18,16 +18,16 @@ import time
 
 T = 25.  # time to stop simulation at
 
-dt = 0.01  # time step size
+dt = 2**-7 # time step size
 
 nsteps = int(T / dt)  # total num of time steps we take
 
 length = 64.
 
 # number of grid cells per unit axis
-N = 2 ** 9
+N = 2 ** 8
 
-initial_state_kw = 'gaussian_even'
+initial_state_kw = 'tritone'
 
 nonlinear = True
 
@@ -98,7 +98,7 @@ plt.rc('font', family='serif')
 
 fig, ax = plt.subplots()
 
-plt.plot(times, 1e2*(E-E[0])/E[0], '-', color='xkcd:teal', linewidth='2')
+plt.plot(times, (E-E[0])/E[0], '-', color='xkcd:teal', linewidth='2')
 
 plt.xlim([0, T])
 # plt.ylim([-5.6,2])
@@ -113,6 +113,6 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-plt.savefig('energy_test_L_N=2^8_dt=2^-8', bbox_inches='tight', dpi=800)
+plt.savefig('energy_test_L_N=2^8_dt=2^-7', bbox_inches='tight', dpi=800)
 
 plt.show()

@@ -26,9 +26,13 @@ dts = np.flip(np.logspace(-nmin, -2, num=nmin-1, base=2.))
 num_dts = np.size(dts)
 
 # prescribe the array of N's we seek to assess
-Ns = np.array([64, 128, 256, 512])  # , 512])  # (2**8)*np.linspace(0.375, 1, num=4, endpoint=True)  # should always use powers of 2 for spectral methods, but the accuracy is important here!
+Ns = np.array([64, 128, 256, 512])
 Ns = Ns.astype(int)
 num_Ns = np.size(Ns)
+
+# set what initial condition we want to deal with
+
+ICkw = 'gaussian_no_parity'
 
 # initialize outputs
 
@@ -44,7 +48,7 @@ for k in np.arange(0, num_Ns):
 
     # do simulation at the worst order (largest time step) first
 
-    rough_sim = simulation(length, T, N, dts[0], 'gaussian_no_parity', nonlinear=True)
+    rough_sim = simulation(length, T, N, dts[0], ICkw, nonlinear=True)
 
     rough_filename = rough_sim.filename
 
@@ -63,7 +67,7 @@ for k in np.arange(0, num_Ns):
 
     for dt in dts:
 
-        fine_sim = simulation(length, T, N, 0.5*dt, 'gaussian_no_parity', nonlinear=True)
+        fine_sim = simulation(length, T, N, 0.5*dt, ICkw, nonlinear=True)
 
         fine_filename = fine_sim.filename
 
@@ -128,9 +132,14 @@ plt.savefig('nonlinear_accuracy_test_gaussian_no_parity_longtime', bbox_inches='
 
 plt.show()
 
-# """
-params = np.polyfit(np.log10(dts[0:-1]), np.log10(errors[-1, 0:-1]), 1)
+"""
+
+# estimate the slope of particular error curves if you want. Needs a bit of by-hand tweaking bcz for small enough dt
+# we can get level-off or rounding error domination in the error curve, destroying the linear trend after a certain
+# threshold
+
+params = np.polyfit(np.log10(dts[0:6]), np.log10(errors[-1, 0:6]), 1)
 slope = params[0]
 
 print('Estimated slope at N = 512 is slope = ', slope)
-# """
+"""
