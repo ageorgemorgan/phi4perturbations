@@ -52,18 +52,12 @@ for k in np.arange(0, num_Ns):
 
         filename = sim.filename
 
-        print(filename)
-
         try:
             # load the pkl file and try plotting again
             with open(filename, 'rb') as inp:
                 sim = pickle.load(inp)
 
-            print('Found it!')
-
         except:
-
-            print('Gotta go from scratch!')
 
             sim.run_sim()
 

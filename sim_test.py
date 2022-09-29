@@ -19,12 +19,12 @@ length = 64.
 # number of grid cells per unit axis
 N = 2 ** 8
 
-initial_state_kw = 'gaussian_no_parity'
+initial_state_kw = 'translational_mode'
 
 # create the simulation object by prescribing physical parameters and initial conditions
 my_sim = simulation(length, T, N, dt, initial_state_kw, nonlinear=True)
 
-"""
+# """
 # run the simulation
 start = time.time()
 my_sim.run_sim()
@@ -37,7 +37,7 @@ Udata = my_sim.Udata
 
 # save the output to a pkl
 my_sim.save()
-"""
+# """
 # also test  that load functionality works
 
 filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_ICkw=' + initial_state_kw + '_nonlinear=True.pkl'
@@ -46,13 +46,13 @@ filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '_
 with open(filename, 'rb') as inp:
     my_sim = pickle.load(inp)
 
-    # my_sim.hov_plot(show_figure=True, save_figure=True)
+    my_sim.hov_plot(show_figure=True, save_figure=True)
 
-    # my_sim.phi_plot(show_figure=True, save_figure=True)
+    my_sim.phi_plot(show_figure=True, save_figure=True)
 
     # my_sim.save_movie()
 
-    # my_sim.save_phimovie()
+    my_sim.save_phimovie()
 
     # my_sim.save_psmovie()
 

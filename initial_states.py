@@ -27,8 +27,6 @@ def initial_state(x, initial_state_kw):
 
     elif initial_state_kw == 'internal_mode':
 
-        # a = 1.2*np.sqrt(2.)  # this value gives the Getmanov tri-tone!
-
         out[0, :] = np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
 
     elif initial_state_kw == 'tritone':

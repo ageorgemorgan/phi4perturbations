@@ -44,7 +44,7 @@ for k in np.arange(0, num_Ns):
 
     # do simulation at the worst order (largest time step) first
 
-    rough_sim = simulation(length, T, N, dts[0], 'internal_mode', nonlinear=True)
+    rough_sim = simulation(length, T, N, dts[0], 'gaussian_no_parity', nonlinear=True)
 
     rough_filename = rough_sim.filename
 
@@ -63,7 +63,7 @@ for k in np.arange(0, num_Ns):
 
     for dt in dts:
 
-        fine_sim = simulation(length, T, N, 0.5*dt, 'internal_mode', nonlinear=True)
+        fine_sim = simulation(length, T, N, 0.5*dt, 'gaussian_no_parity', nonlinear=True)
 
         fine_filename = fine_sim.filename
 
@@ -124,12 +124,12 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-plt.savefig('linear_accuracy_test_internal_mode_longtime', bbox_inches='tight', dpi=800)
+plt.savefig('nonlinear_accuracy_test_gaussian_no_parity_longtime', bbox_inches='tight', dpi=800)
 
 plt.show()
 
 # """
-params = np.polyfit(np.log10(dts[0:]), np.log10(errors[-1, 0:]), 1)
+params = np.polyfit(np.log10(dts[0:-1]), np.log10(errors[-1, 0:-1]), 1)
 slope = params[0]
 
 print('Estimated slope at N = 512 is slope = ', slope)

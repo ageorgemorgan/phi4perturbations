@@ -292,9 +292,7 @@ def save_combomovie(u, x, length, dt, ndump, filename):
 
     v = fftshift(v, axes=1)
 
-    # TODO: massage location params below (first two numbers) and size params below (last two numbers) to make the combo
-    # movies look even better
-    ins = ax.inset_axes([0.67, 0.67, 0.3, 0.3], xlim=(kmin, kmax), ylim=(vmin, vmax))
+    ins = ax.inset_axes([0.69, 0.685, 0.3, 0.3], xlim=(kmin, kmax), ylim=(vmin, vmax))
 
     # use cubic spline interpolation to smooth the state data
 
@@ -349,7 +347,7 @@ def save_combomovie(u, x, length, dt, ndump, filename):
     ins.set_xlabel('$k$', fontsize=11)
 
     line, = ax.plot([], [], linewidth=2, color='xkcd:ocean green')
-    iline, = ins.plot([], [], linewidth=1.5, color='xkcd:dark orange')
+    iline, = ins.plot([], [], linewidth=1., color='xkcd:dark orange')
 
     timer = fig.canvas.new_timer(interval=100)
     timer.add_callback(u, ax)

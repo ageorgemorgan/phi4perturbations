@@ -13,8 +13,6 @@ def bound_state(x, t, mode_kw):
 
     elif mode_kw == 'internal_mode':
 
-        # a = 1.2 * np.sqrt(2.)
-
         out[0, :] = np.cos(np.sqrt(3/2)*t)*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
         out[1, :] = -np.sqrt(3./2.)*np.sin(np.sqrt(3/2)*t)*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
 

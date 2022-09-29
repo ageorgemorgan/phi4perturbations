@@ -25,7 +25,7 @@ num_dts = np.size(dts)
 Ts = num_steps*dts
 
 # prescribe the array of N's we seek to assess
-Ns = np.array([64, 128, 256])
+Ns = np.array([128, 256])
 Ns = Ns.astype(int)
 num_Ns = np.size(Ns)
 # initialize outputs
@@ -82,12 +82,10 @@ plt.rc('font', family='serif')
 
 fig, ax = plt.subplots()
 
-#plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=64$")
-#plt.loglog(dts, errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=128$")
-plt.loglog(dts, errors[1, :],  color='xkcd:raspberry', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=256$")
-plt.loglog(dts, errors[2, :],  color='xkcd:goldenrod', linewidth='2', linestyle='solid')
+plt.loglog(dts, errors[0, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=128$")
+plt.loglog(dts, errors[0, :],  color='xkcd:raspberry', linewidth='2', linestyle='solid')
+plt.loglog(dts, errors[1, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=256$")
+plt.loglog(dts, errors[1, :],  color='xkcd:goldenrod', linewidth='2', linestyle='solid')
 
 ax.legend(fontsize=16)
 
@@ -101,6 +99,6 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-plt.savefig('translational_mode_accuracy_test_1e3_steps', bbox_inches='tight', dpi=800)
+plt.savefig('translational_mode_accuracy_test_1e4_steps', bbox_inches='tight', dpi=800)
 
 plt.show()
