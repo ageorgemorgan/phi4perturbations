@@ -19,30 +19,31 @@ from visualization import hov_plot, save_movie, save_psmovie, save_combomovie
 
 
 class simulation:
-    def __init__(self, length, T, N, dt, initial_state_kw, nonlinear):
+    def __init__(self, length, T, N, dt, initial_state_kw, nonlinear, absorbing_layer):
         self.length = length
         self.T = T
         self.N = N
         self.dt = dt
         self.initial_state_kw = initial_state_kw
         self.nonlinear = nonlinear
+        self.absorbing_layer = absorbing_layer
         self.x = np.linspace(-0.5 * self.length, 0.5 * self.length, self.N, endpoint=False)
         self.initial_state = initial_state(self.x, self.initial_state_kw)
         self.ndump = 20.  # hyperparameter describing how often we save our time steps
-        self.filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '.pkl'
-        self.picname = 'hovplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '.png'
-        self.phipicname = 'phiplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '.png'
-        self.moviename = 'movie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '.mp4'
-        self.phimoviename = 'phimovie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '.mp4'
-        self.psmoviename = 'psmovie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '.mp4'
-        self.combomoviename = 'combomovie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '.mp4'
+        self.filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.pkl'
+        self.picname = 'hovplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.png'
+        self.phipicname = 'phiplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.png'
+        self.moviename = 'movie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.mp4'
+        self.phimoviename = 'phimovie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.mp4'
+        self.psmoviename = 'psmovie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.mp4'
+        self.combomoviename = 'combomovie_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear)+ '_abslayer=' + str(self.absorbing_layer) + '.mp4'
         self.Udata = None  # the Udata will be called later!
 
     # a function for actually performing the time-stepping on a simulation object. Adds the property Udata
     # to the simulation object (the actual values of our solution throughout the simulation)
     def run_sim(self):
 
-        Udata = do_time_stepping(self.length, self.T, self.N, self.dt, self.initial_state, ndump=self.ndump, nonlinear=self.nonlinear)
+        Udata = do_time_stepping(self.length, self.T, self.N, self.dt, self.initial_state, ndump=self.ndump, nonlinear=self.nonlinear, absorbing_layer=self.absorbing_layer)
 
         self.Udata = Udata
 

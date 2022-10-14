@@ -7,6 +7,8 @@ from scipy.sparse import linalg
 
 from phi4_model import fourier_forcing, get_spatial_operator
 
+from absorbing_layer import rayleigh_damping
+
 # The intention with this script is to independent of the particular
 # PDE we're considering insofar as is possible.
 
@@ -62,7 +64,7 @@ def get_greeks(length, N, dt, A):
     return out
 
 
-def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True, ndump=10):
+def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True, absorbing_layer=False, ndump=10):
     # TODO: replace the syntax so the input is a simulation object instead of a whole bunch of crap... I think it's nice
     # that the simulation object only touches the time-stepping script directly. Alternatively have the input
     # be a dict that is constructed from a simulation object.
@@ -75,6 +77,12 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True, ndump=10):
     # the propagators
 
     A = get_spatial_operator(length, N)
+
+    # create forcing term, including the damping term from artificial sponge layer
+
+    def forcing(V):
+
+        return fourier_forcing(V, x, nonlinear=nonlinear) + float(absorbing_layer)*rayleigh_damping(V, x, length, delta=0.2*length)
 
     # obtain the Greeks.
     # first check if we've already computed the Greeks on the required grid
@@ -115,7 +123,7 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True, ndump=10):
 
     for n in np.arange(1, nsteps+1):
 
-        fV = fourier_forcing(V, x, nonlinear=nonlinear)
+        fV = forcing(V)
 
         Vhalf = propagator2 @ V  # note: @ takes advantage of sparsity.
 
@@ -123,19 +131,19 @@ def do_time_stepping(length, T, N, dt, initial_state, nonlinear=True, ndump=10):
 
         a = np.reshape(a, (2 * N,))
 
-        fa = fourier_forcing(a, x, nonlinear=nonlinear)
+        fa = forcing(a)
 
         b = Vhalf + np.asarray(Q @ fa)
 
         b = np.reshape(b, (2 * N,))
 
-        fb = fourier_forcing(b, x, nonlinear=nonlinear)
+        fb = forcing(b)
 
         c = np.asarray(propagator2 @ a + Q @ (2. * fb - fV))
 
         c = np.reshape(c, (2 * N,))
 
-        fc = fourier_forcing(c, x, nonlinear=nonlinear)
+        fc = forcing(c)
 
         # now assemble the guess at the new step
         V = np.asarray(propagator @ V + f1 @ fV + 2. * f2 @ (fa + fb) + f3 @ fc)
