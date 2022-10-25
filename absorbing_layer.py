@@ -40,7 +40,7 @@ def rayleigh_damping(V, x, length, delta=0.1):
 
     V = np.reshape(V, (2 * N,))
 
-    v = np.real(ifft(V[N:]))  # only ifft first N entries of V because of storage conventions
+    v = np.real(ifft(V[N:]))  # only ifft last N-1 entries of V because of storage conventions
 
     out = 1j * np.zeros(2 * N, dtype=float)
     beta = damping_coeff(x, length, delta=delta)

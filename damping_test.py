@@ -22,7 +22,7 @@ length = 64.
 # number of grid cells per unit axis
 N = 2 ** 9
 
-initial_state_kw = 'gaussian_odd'
+initial_state_kw = 'internal_mode'
 
 # create the simulation object by prescribing physical parameters, discretization parameters, initial conditions, and
 # whether or not we want to include nonlinearity

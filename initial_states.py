@@ -27,7 +27,7 @@ def initial_state(x, initial_state_kw):
 
     elif initial_state_kw == 'internal_mode':
 
-        out[0, :] = amp*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
+        out[0, :] = 0.1*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
 
     elif initial_state_kw == 'tritone':
 
