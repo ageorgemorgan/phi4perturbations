@@ -29,7 +29,7 @@ class simulation:
         self.absorbing_layer = absorbing_layer
         self.x = np.linspace(-0.5 * self.length, 0.5 * self.length, self.N, endpoint=False)
         self.initial_state = initial_state(self.x, self.initial_state_kw)
-        self.ndump = 2**7  # hyperparameter describing how often we save our time steps
+        self.ndump = 10.  # hyperparameter describing how often we save our time steps
         self.filename = 'simdata_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.pkl'
         self.picname = 'hovplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.png'
         self.phipicname = 'phiplot_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N, self.dt) + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer=' + str(self.absorbing_layer) + '.png'
